@@ -206,6 +206,13 @@ function BookSeatButton() {
     setTimeout(() => setState('success'), 1500)
   }
 
+  // Reset to idle after success so the animation can be replayed
+  useEffect(() => {
+    if (state !== 'success') return
+    const id = setTimeout(() => setState('idle'), 2800)
+    return () => clearTimeout(id)
+  }, [state])
+
   // Scale thump → horizontal rattle when confetti fires
   useEffect(() => {
     if (state !== 'success' || !shakeRef.current) return

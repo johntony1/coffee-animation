@@ -14,7 +14,7 @@
  *    0ms   icon squishes to scale 0.82
  *  100ms   icon returns to scale 1.0
  *    0ms   color cross-fades #171717 → #D4D4D4
- *    0ms   steam wisps fade out instantly
+ *    0ms   steam wisps retract into cup (pathLength 1→0, ease-in)
  * ───────────────────────────────────────────────────────── */
 
 import { useEffect, useRef } from 'react'
@@ -54,7 +54,8 @@ const STEAM = {
   drawEase:        [0.25, 0.1, 0.25, 1] as [number, number, number, number],
   drawDelay:       0.1,   // delay after cup burst before steam starts drawing
   stagger:         0.08,  // delay between wisp 1 and wisp 2
-  fadeOutDuration: 0.15,
+  retractDuration: 0.3,
+  retractEase:     [0.4, 0, 0.8, 1] as [number, number, number, number],
   opacity:         0.7,
 }
 
@@ -126,10 +127,8 @@ export function AnimatedCoffee({ isActive, size = 40 }: AnimatedCoffeeProps) {
     }
   }, [isActive])
 
-  // Steam draw-in vs fade-out targets
-  const steamTarget = isActive
-    ? { pathLength: 1, opacity: STEAM.opacity }
-    : { pathLength: 0, opacity: 0 }
+  // Opacity stays constant — pathLength alone controls visibility on both enter and exit
+  const steamTarget = { pathLength: isActive ? 1 : 0 }
 
   return (
     <div
@@ -192,47 +191,37 @@ export function AnimatedCoffee({ isActive, size = 40 }: AnimatedCoffeeProps) {
             d="M 25 17 Q 30 17 30 22 Q 30 27 25 27"
           />
 
-          {/* ── Steam wisp 1 (left) — draws from cup upward ── */}
+          {/* ── Steam wisp 1 (left) — draws up on activate, retracts on deactivate ── */}
           <motion.path
             d="M 11 12 C 9 8.5 13 5.5 11 2"
             fill="none"
             stroke="currentColor"
             strokeWidth={1.5}
             strokeLinecap="round"
+            style={{ opacity: STEAM.opacity }}
             initial={false}
             animate={steamTarget}
             transition={{
-              pathLength: {
-                duration: STEAM.drawDuration,
-                ease:     STEAM.drawEase,
-                delay:    isActive ? STEAM.drawDelay : 0,
-              },
-              opacity: {
-                duration: isActive ? 0.2 : STEAM.fadeOutDuration,
-                delay:    isActive ? STEAM.drawDelay : 0,
-              },
+              pathLength: isActive
+                ? { duration: STEAM.drawDuration, ease: STEAM.drawEase, delay: STEAM.drawDelay }
+                : { duration: STEAM.retractDuration, ease: STEAM.retractEase },
             }}
           />
 
-          {/* ── Steam wisp 2 (right) — draws staggered after wisp 1 ── */}
+          {/* ── Steam wisp 2 (right) — staggered 80ms after wisp 1 ── */}
           <motion.path
             d="M 21 12 C 23 8.5 19 5.5 21 2"
             fill="none"
             stroke="currentColor"
             strokeWidth={1.5}
             strokeLinecap="round"
+            style={{ opacity: STEAM.opacity }}
             initial={false}
             animate={steamTarget}
             transition={{
-              pathLength: {
-                duration: STEAM.drawDuration,
-                ease:     STEAM.drawEase,
-                delay:    isActive ? STEAM.drawDelay + STEAM.stagger : 0,
-              },
-              opacity: {
-                duration: isActive ? 0.2 : STEAM.fadeOutDuration,
-                delay:    isActive ? STEAM.drawDelay + STEAM.stagger : 0,
-              },
+              pathLength: isActive
+                ? { duration: STEAM.drawDuration, ease: STEAM.drawEase, delay: STEAM.drawDelay + STEAM.stagger }
+                : { duration: STEAM.retractDuration, ease: STEAM.retractEase },
             }}
           />
 
