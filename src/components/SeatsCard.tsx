@@ -589,7 +589,6 @@ export function SeatsCard() {
               margin:              0,
               textAlign:           'center',
               fontFeatureSettings: "'ss11' 1, 'calt' 0, 'liga' 0",
-              // @ts-expect-error textWrap not yet in React's CSSProperties
               textWrap:            'pretty',
             }}
           >
