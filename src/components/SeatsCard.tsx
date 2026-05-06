@@ -69,6 +69,16 @@ const FOOTER = {
   duration: 0.3,
 }
 
+const COUNT_MESSAGES: Record<number, string> = {
+  0: "Choose the drinks you'd like to order",
+  1: 'Perfect — one coffee coming up',
+  2: 'Two coffees, great for sharing',
+  3: 'Three? Now we’re talking',
+  4: 'Four coffees… someone needs energy',
+  5: 'Five?! That’s a lot of caffeine',
+  6: 'Whoa — that’s too much coffee!',
+}
+
 // Fill pill: grows from left edge, proportional to count/MAX
 // scaleX = count/MAX, transformOrigin = left
 const FILL_PILL = {
@@ -580,20 +590,39 @@ export function SeatsCard() {
           transition={{ duration: FOOTER.duration, delay: TIMING.footerDelay, ease: FOOTER.ease }}
           style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', width: '100%' }}
         >
-          <p
+          <div
             style={{
-              fontSize:            13,
-              fontWeight:          400,
-              color:               '#5c5c5c',
-              letterSpacing:       '-0.078px',
-              margin:              0,
-              textAlign:           'center',
-              fontFeatureSettings: "'ss11' 1, 'calt' 0, 'liga' 0",
-              textWrap:            'pretty',
+              position:   'relative',
+              height:     18,
+              width:      '100%',
+              overflow:   'hidden',
+              textAlign:  'center',
             }}
           >
-            Choose the drinks you'd like to order
-          </p>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.p
+                key={count}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.22, ease: [0.2, 0, 0, 1] }}
+                style={{
+                  position:            'absolute',
+                  inset:               0,
+                  fontSize:            13,
+                  fontWeight:          400,
+                  color:               '#5c5c5c',
+                  letterSpacing:       '-0.078px',
+                  margin:              0,
+                  textAlign:           'center',
+                  fontFeatureSettings: "'ss11' 1, 'calt' 0, 'liga' 0",
+                  textWrap:            'pretty',
+                }}
+              >
+                {COUNT_MESSAGES[count] ?? COUNT_MESSAGES[0]}
+              </motion.p>
+            </AnimatePresence>
+          </div>
 
           <BookSeatButton />
         </motion.div>
